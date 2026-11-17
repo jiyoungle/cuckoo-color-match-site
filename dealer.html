@@ -1061,6 +1061,12 @@ body.report-mode .report-view{display:block}
       <feColorMatrix type="matrix" values="0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 -1.2 0.9"/>
     </filter>
     <filter id="f-soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="f-lite" x="-8%" y="-10%" width="116%" height="124%" color-interpolation-filters="sRGB">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="3.2" result="b"/>
+      <feOffset in="b" dy="2" result="o"/>
+      <feFlood flood-color="#000" flood-opacity=".20"/><feComposite in2="o" operator="in"/>
+    </filter>
   </defs>
 </svg>
 
@@ -3500,11 +3506,13 @@ var qrcode = function() {
     var M=find(MODELS,S.model), sz=(black&&M.black)?M.blackSz[a]:M.sz[a], ph=Math.round(pw*sz[1]/sz[0]);
     var px=Math.round((W-pw)/2);
     var py=flat?Math.round(cTop+(cFront-cTop-ph)/2+6):(a==='front'?cFront-ph-60:cFront-ph-95);
-    // 위에서/정면: 그림자 없이 제품 이미지만 올립니다
+    // 위에서/정면: 아주 약한 접촉 그림자만 둡니다
     var fl=(black&&!M.black)?' style="filter:invert(1) brightness(.92) contrast(1.08)"':'';
     var pHref=(black&&M.black)?M.black[a]:M.img[a];
     if(flat||a==='front'){
-      s+='<image href="'+pHref+'" x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'"'+fl+'/>';
+      // 아주 약한 접촉 그림자 (윤곽을 따라 가볍게)
+      s+='<defs><image id="pi-'+color+'" href="'+pHref+'" x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'"'+fl+'/></defs>';
+      s+='<use href="#pi-'+color+'" filter="url(#f-lite)"/><use href="#pi-'+color+'"/>';
     } else {
       s+='<polygon points="'+((black&&M.black&&M.fp)?M.fp.black:((M.fp&&M.fp.white)||[[0,.41],[.41,0],[1,.37],[.65,1]])).map(function(p){return Math.round(px+p[0]*pw+10)+','+Math.round(py+p[1]*ph+16)}).join(' ')+'" fill="#000" opacity=".4" filter="url(#f-soft)"/>';
       s+='<image href="'+pHref+'" x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'"'+fl+'/>';

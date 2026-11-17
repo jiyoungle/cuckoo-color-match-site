@@ -1077,8 +1077,8 @@ body.report-mode .report-view{display:block}
     <h1>인덕션 컬러 매칭</h1>
     <div class="bar">
       <div class="seg" role="group" aria-label="제품 각도">
-        <button data-a="top" aria-pressed="false">정면</button>
-        <button data-a="front" aria-pressed="false">위에서</button>
+        <button data-a="top" aria-pressed="false">위에서</button>
+        <button data-a="front" aria-pressed="false">앞에서</button>
         <button data-a="tq" aria-pressed="false">갤러리</button>
       </div>
       <div class="seg" role="group" aria-label="보기 방식">
@@ -3996,6 +3996,15 @@ var qrcode = function() {
     car.querySelector('.next').onclick=function(){ el.scrollBy({left:el.clientWidth*0.8,behavior:'smooth'}); };
   });
   window.addEventListener('resize',function(){ ['c-top','c-cab','c-wall'].forEach(function(id){ updateCar($(id)); }); });
+  // 갤러리 화면에서 비교·소재 선택·추천 조합을 누르면 직전 제품 화면으로 자동 이동합니다
+  var lastAngle=(S.angle&&S.angle!=='tq')?S.angle:'top';
+  document.addEventListener('click',function(e){
+    var el=e.target&&e.target.closest?e.target:null; if(!el) return;
+    var ang=el.closest('[data-a]');
+    if(ang){ var v=ang.getAttribute('data-a'); if(v&&v!=='tq') lastAngle=v; return; }
+    if(S.angle!=='tq') return;
+    if(el.closest('#v-one,#v-two')||el.closest('.controls .chip')||el.closest('#recs button')) S.angle=lastAngle;
+  },true);
   LikeStore.onChange=function(){ render(); };
   LikeStore.connect();
   render();
